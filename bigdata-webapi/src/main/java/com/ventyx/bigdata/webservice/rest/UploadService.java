@@ -1,6 +1,8 @@
 package com.ventyx.bigdata.webservice.rest;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ import java.util.List;
 @Component
 @Path("/upload")
 public class UploadService {
+
+    private static final Logger log = LoggerFactory.getLogger(UploadService.class);
 
     private String uploadFilepath;
 
@@ -67,8 +71,8 @@ public class UploadService {
                 stream.close();
                 out.flush();
                 out.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                log.error("Error reading attachment", ex);
             }
         }
 
@@ -84,8 +88,7 @@ public class UploadService {
 
                 String[] name = filename.split("=");
 
-                String finalFileName = name[1].trim().replaceAll("\"", "");
-                return finalFileName;
+                return name[1].trim().replaceAll("\"", "");
             }
         }
         return "unknown";

@@ -25,7 +25,7 @@ import java.util.List;
 public class QueryService {
 
     private static final Logger log = LoggerFactory.getLogger(QueryService.class);
-    private static final SimpleDateFormat timeStampFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private final SimpleDateFormat timeStampFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     private List<List<String>> meterData = new ArrayList<List<String>>();
 
@@ -36,9 +36,11 @@ public class QueryService {
         if (inputStream == null) {
             log.error("Error loading sample meter data, file not found.");
         } else {
+
+            BufferedReader bufferedReader = null;
             try {
 
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
                 String line = null;
                 while ((line = bufferedReader.readLine()) != null) {
@@ -51,6 +53,12 @@ public class QueryService {
 
             } catch (IOException ex) {
                 log.error("Error loading sample meter data", ex);
+            }  finally {
+                try {
+                    bufferedReader.close();
+                } catch (IOException ex) {
+                    //silent
+                }
             }
         }
 
@@ -92,11 +100,11 @@ public class QueryService {
         for (List<String> meterLine : meterData) {
             if (meterLine.contains(meterId)) {
 
-                String returnValue = "";
+                StringBuilder returnValue = new StringBuilder();
                 for (String data : meterLine) {
-                    returnValue += data + ",";
+                    returnValue.append(data + ",");
                 }
-                return returnValue;
+                return returnValue.toString();
             }
         }
 
